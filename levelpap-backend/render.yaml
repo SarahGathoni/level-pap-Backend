@@ -1,0 +1,62 @@
+services:
+  # Web Service (FastAPI Backend)
+  - type: web
+    name: levelpap-backend
+    runtime: python
+    plan: free  # Change to 'starter' or 'standard' for production
+    region: oregon  # Change to your preferred region
+    buildCommand: pip install -r requirements.txt && alembic upgrade head
+    startCommand: bash start.sh
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: levelpap-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: 30
+      - key: ENVIRONMENT
+        value: production
+      - key: DEBUG
+        value: false
+      - key: CORS_ORIGINS
+        value: https://your-frontend-domain.com  # Update with your frontend URL
+      # Email Configuration (update with your SMTP settings)
+      - key: SMTP_HOST
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: 587
+      - key: SMTP_USER
+        sync: false  # Set manually in Render dashboard
+      - key: SMTP_PASSWORD
+        sync: false  # Set manually in Render dashboard
+      - key: FROM_EMAIL
+        value: noreply@levelpap.com
+      # Payment Providers (set manually in Render dashboard)
+      - key: MPESA_CONSUMER_KEY
+        sync: false
+      - key: MPESA_CONSUMER_SECRET
+        sync: false
+      - key: MPESA_SHORTCODE
+        sync: false
+      - key: MPESA_PASSKEY
+        sync: false
+      - key: MPESA_ENVIRONMENT
+        value: sandbox  # Change to 'production' when ready
+      - key: FLUTTERWAVE_PUBLIC_KEY
+        sync: false
+      - key: FLUTTERWAVE_SECRET_KEY
+        sync: false
+      - key: FLUTTERWAVE_ENCRYPTION_KEY
+        sync: false
+
+  # PostgreSQL Database
+  - type: pspg
+    name: levelpap-db
+    plan: free  # Change to 'starter' or 'standard' for production
+    databaseName: levelpap_db
+    databaseUser: levelpap_user
+
